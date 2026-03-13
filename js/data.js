@@ -75,6 +75,7 @@ function logout() {
     localStorage.removeItem('userRole');
     localStorage.removeItem('token');
     localStorage.removeItem('authToken');
+    localStorage.removeItem('authUser');
     localStorage.removeItem('authUserId');
     localStorage.removeItem('currentUser'); // legacy cleanup
     console.log('[Auth] Logout successful');
@@ -130,11 +131,13 @@ function renderSidebar(activePage, role) {
     });
 
     html += `
-            <a class="nav-link mt-auto text-danger" href="#" onclick="logout()">
+        </nav>
+        <div class="sidebar-logout">
+            <button id="logoutBtn" class="btn w-100">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Logout</span>
-            </a>
-        </nav>
+            </button>
+        </div>
     `;
 
     sidebar.innerHTML = html;
@@ -154,6 +157,11 @@ function renderSidebar(activePage, role) {
             }
         });
     }
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => logout());
+    }
 }
 
 function renderTopNav(userName) {
@@ -168,15 +176,20 @@ function renderTopNav(userName) {
                 </button>
                 <h4 class="fw-bold mb-0">Welcome Back, ${userName}!</h4>
             </div>
-            <div class="user-profile">
+            <div class="header-right">
+                <button id="logoutBtnTop" class="logout-btn">Logout</button>
+                <div class="user-profile">
                 <div class="user-avatar">${userName.charAt(0)}</div>
                 <div class="d-none d-md-block">
                     <div class="fw-bold small">${userName}</div>
                     <div class="text-muted" style="font-size: 0.7rem;">Active Now</div>
+                </div>
                 </div>
             </div>
         </header>
     `;
 
     mainWrapper.insertAdjacentHTML('afterbegin', navHtml);
+    const btn = document.getElementById('logoutBtnTop');
+    if (btn) btn.addEventListener('click', () => logout());
 }

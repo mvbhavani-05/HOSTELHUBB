@@ -60,6 +60,7 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/data.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -69,46 +70,56 @@
             renderTopNav(user.name);
             loadRooms();
 
-            document.getElementById('roomForm').addEventListener('submit', (e) => {
+            document.getElementById('roomForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const rooms = getData('rooms');
-                rooms.push({
-                    roomNo: document.getElementById('r-no').value,
-                    type: document.getElementById('r-type').value,
-                    capacity: parseInt(document.getElementById('r-capacity').value),
-                    occupied: 0,
-                    status: 'Available'
-                });
-                saveData('rooms', rooms);
-                bootstrap.Modal.getInstance(document.getElementById('roomModal')).hide();
-                loadRooms();
+                const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+                const payload = {
+                    roomNumber: document.getElementById('r-no').value,
+                    roomType: document.getElementById('r-type').value.toLowerCase(),
+                    capacity: parseInt(document.getElementById('r-capacity').value)
+                };
+                try {
+                    await apiAdminCreateRoom(token, payload);
+                    bootstrap.Modal.getInstance(document.getElementById('roomModal')).hide();
+                    loadRooms();
+                } catch (err) {
+                    alert(err.message || 'Failed to create room');
+                }
             });
         });
 
-        function loadRooms() {
-            const rooms = getData('rooms');
+        async function loadRooms() {
+            const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+            let rooms = [];
+            try {
+                const data = await apiAdminGetRooms(token);
+                rooms = data.rooms || [];
+            } catch {
+                rooms = [];
+            }
             const grid = document.getElementById('rooms-grid');
             
             grid.innerHTML = rooms.map(r => {
-                const percent = (r.occupied / r.capacity) * 100;
+                const occupied = r.currentOccupancy || r.occupied || 0;
+                const percent = (occupied / r.capacity) * 100;
                 const progressClass = percent === 100 ? 'bg-danger' : 'bg-success';
                 return `
                     <div class="col-md-4 col-lg-3">
                         <div class="stat-card">
                             <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="stat-icon ${r.type === 'AC' ? 'icon-blue' : 'icon-orange'} mb-0">
+                                <div class="stat-icon ${((r.roomType || r.type) === 'AC') ? 'icon-blue' : 'icon-orange'} mb-0">
                                     <i class="bi bi-door-closed"></i>
                                 </div>
-                                <span class="badge badge-custom ${r.occupied >= r.capacity ? 'badge-danger' : 'badge-success'}">
-                                    ${r.occupied >= r.capacity ? 'Full' : 'Available'}
+                                <span class="badge badge-custom ${occupied >= r.capacity ? 'badge-danger' : 'badge-success'}">
+                                    ${occupied >= r.capacity ? 'Full' : 'Available'}
                                 </span>
                             </div>
-                            <h4 class="fw-bold mb-1">Room ${r.roomNo}</h4>
-                            <p class="text-muted small mb-3">${r.type}</p>
+                            <h4 class="fw-bold mb-1">Room ${r.roomNumber || r.roomNo}</h4>
+                            <p class="text-muted small mb-3">${(r.roomType || r.type || '').toUpperCase()}</p>
                             
                             <div class="d-flex justify-content-between small mb-1">
                                 <span>Occupancy</span>
-                                <span>${r.occupied}/${r.capacity}</span>
+                                <span>${occupied}/${r.capacity}</span>
                             </div>
                             <div class="progress mb-0" style="height: 6px; border-radius: 10px;">
                                 <div class="progress-bar ${progressClass}" style="width: ${percent}%"></div>

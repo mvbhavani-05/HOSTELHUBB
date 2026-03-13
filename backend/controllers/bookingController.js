@@ -4,7 +4,7 @@ const Booking = require('../models/Booking');
 // POST /api/bookings
 const createBooking = async (req, res) => {
   try {
-    const { hostelId, bookingDate } = req.body;
+    const { hostelId, bookingDate, roomId } = req.body;
 
     if (!hostelId || !bookingDate) {
       return res.status(400).json({ message: 'Hostel and booking date are required' });
@@ -15,6 +15,7 @@ const createBooking = async (req, res) => {
       hostelId,
       bookingDate,
       status: 'pending',
+      roomId,
     });
 
     return res.status(201).json({

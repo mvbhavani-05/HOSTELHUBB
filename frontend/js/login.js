@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (data.user) {
         const storedUser = { ...data.user, role: normalizedRole };
         localStorage.setItem('user', JSON.stringify(storedUser));
+        localStorage.setItem('authUser', JSON.stringify(storedUser));
         localStorage.setItem('userRole', normalizedRole);
         if (data.user.id) {
           localStorage.setItem('authUserId', data.user.id);

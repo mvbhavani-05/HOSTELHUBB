@@ -8,6 +8,11 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    course: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     email: {
       type: String,
       required: true,
@@ -30,6 +35,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ['student', 'admin'],
       default: 'student',
+    },
+    roomId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Room',
+      default: null,
     },
   },
   {

@@ -130,11 +130,13 @@ function renderSidebar(activePage, role) {
     });
 
     html += `
-            <a class="nav-link mt-auto text-danger" href="#" onclick="logout()">
+        </nav>
+        <div class="sidebar-logout">
+            <button id="logoutBtn" class="btn w-100">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Logout</span>
-            </a>
-        </nav>
+            </button>
+        </div>
     `;
 
     sidebar.innerHTML = html;
@@ -153,6 +155,11 @@ function renderSidebar(activePage, role) {
                 window.location.href = 'index.html';
             }
         });
+    }
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => logout());
     }
 }
 

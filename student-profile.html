@@ -54,12 +54,16 @@
                             </div>
                         </div>
                         <hr class="my-4">
-                        <button class="btn btn-premium px-4">Edit Profile</button>
+                        <div class="d-flex gap-2">
+                            <button id="editProfileBtn" class="btn btn-premium px-4">Edit Profile</button>
+                            <button id="saveProfileBtn" class="btn btn-secondary-premium px-4" style="display:none;">Save Changes</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </main>
+    <script src="js/api.js"></script>
     <script src="js/data.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -77,6 +81,45 @@
             document.getElementById('info-course').textContent = user.course;
             document.getElementById('info-room').textContent = user.roomNo;
             document.getElementById('info-id').textContent = 'HH' + user.id.toString().padStart(4, '0');
+
+            const editBtn = document.getElementById('editProfileBtn');
+            const saveBtn = document.getElementById('saveProfileBtn');
+
+            editBtn.addEventListener('click', () => {
+                const nameEl = document.getElementById('info-name');
+                const phoneEl = document.getElementById('info-phone');
+                const courseEl = document.getElementById('info-course');
+                nameEl.innerHTML = `<input id="edit-name" class="form-control" type="text" value="${user.name}">`;
+                phoneEl.innerHTML = `<input id="edit-phone" class="form-control" type="text" value="${user.phone}">`;
+                courseEl.innerHTML = `<input id="edit-course" class="form-control" type="text" value="${user.course || ''}">`;
+                saveBtn.style.display = 'inline-block';
+                editBtn.disabled = true;
+            });
+
+            saveBtn.addEventListener('click', async () => {
+                const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+                const payload = {
+                    name: document.getElementById('edit-name').value.trim(),
+                    phone: document.getElementById('edit-phone').value.trim(),
+                    course: document.getElementById('edit-course').value.trim(),
+                };
+                try {
+                    const updated = await apiUpdateProfile(token, payload);
+                    const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+                    const merged = { ...storedUser, ...updated.user };
+                    localStorage.setItem('user', JSON.stringify(merged));
+                    document.getElementById('profile-name').textContent = merged.name;
+                    document.getElementById('profile-course').textContent = merged.course || '';
+                    document.getElementById('info-name').textContent = merged.name;
+                    document.getElementById('info-phone').textContent = merged.phone;
+                    document.getElementById('info-course').textContent = merged.course || '';
+                    saveBtn.style.display = 'none';
+                    editBtn.disabled = false;
+                    alert('Profile updated');
+                } catch (e) {
+                    alert(e.message || 'Failed to update profile');
+                }
+            });
         });
     </script>
 </body>

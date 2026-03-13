@@ -83,6 +83,8 @@
     <script src="js/data.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const tokenGuard = localStorage.getItem('authToken') || localStorage.getItem('token');
+            if (!tokenGuard) { window.location.href = 'login.html'; return; }
             const rawUser = localStorage.getItem('user');
             const role = (localStorage.getItem('userRole') || '').toLowerCase();
 

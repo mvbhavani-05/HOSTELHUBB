@@ -1,12 +1,10 @@
-// Booking model definition linking users to hostel bookings.
 const mongoose = require('mongoose');
 
-const bookingSchema = new mongoose.Schema(
+const maintenanceRequestSchema = new mongoose.Schema(
   {
-    userId: {
+    studentId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
     },
     hostelId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -17,14 +15,20 @@ const bookingSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Room',
     },
-    bookingDate: {
-      type: Date,
+    category: {
+      type: String,
       required: true,
+      trim: true,
+    },
+    description: {
+      type: String,
+      required: true,
+      trim: true,
     },
     status: {
       type: String,
-      enum: ['pending', 'confirmed', 'cancelled'],
-      default: 'pending',
+      enum: ['Pending', 'In Progress', 'Resolved'],
+      default: 'Pending',
     },
   },
   {
@@ -32,7 +36,4 @@ const bookingSchema = new mongoose.Schema(
   }
 );
 
-const Booking = mongoose.model('Booking', bookingSchema);
-
-module.exports = Booking;
-
+module.exports = mongoose.model('MaintenanceRequest', maintenanceRequestSchema);

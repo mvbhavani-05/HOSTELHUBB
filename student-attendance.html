@@ -61,6 +61,7 @@
             </div>
         </div>
     </main>
+    <script src="js/api.js"></script>
     <script src="js/data.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -69,8 +70,26 @@
             renderSidebar('Attendance', user.role);
             renderTopNav(user.name);
 
-            document.getElementById('att-percent').textContent = user.attendance + '%';
-            document.getElementById('att-bar').style.width = user.attendance + '%';
+            const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+            const studentId = localStorage.getItem('authUserId');
+            apiStudentAttendance(token, studentId)
+                .then(data => {
+                    const pct = data.percentage || 0;
+                    document.getElementById('att-percent').textContent = pct + '%';
+                    document.getElementById('att-bar').style.width = pct + '%';
+                    const tbody = document.querySelector('tbody');
+                    tbody.innerHTML = (data.attendanceLog || []).map(l => `
+                        <tr>
+                            <td>${new Date(l.date).toLocaleDateString()}</td>
+                            <td><span class="badge badge-custom ${l.status === 'present' ? 'badge-success' : 'badge-danger'}">${l.status === 'present' ? 'Present' : 'Absent'}</span></td>
+                            <td>${l.timeIn || '-'}</td>
+                        </tr>
+                    `).join('');
+                })
+                .catch(() => {
+                    document.getElementById('att-percent').textContent = '0%';
+                    document.getElementById('att-bar').style.width = '0%';
+                });
         });
     </script>
 </body>

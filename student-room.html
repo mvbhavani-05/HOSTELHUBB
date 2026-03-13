@@ -50,6 +50,7 @@
             </div>
         </div>
     </main>
+    <script src="js/api.js"></script>
     <script src="js/data.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -58,33 +59,38 @@
             renderSidebar('Room Details', user.role);
             renderTopNav(user.name);
 
-            const rooms = getData('rooms');
-            const room = rooms.find(r => r.roomNo === user.roomNo);
-            
-            if (room) {
-                document.getElementById('r-number').textContent = room.roomNo;
-                document.getElementById('r-type').textContent = room.type;
-                document.getElementById('r-capacity').textContent = room.capacity + ' Persons';
-                document.getElementById('r-occupied').textContent = room.occupied + ' Occupied';
-            }
-
-            const students = getData('students');
-            const roommates = students.filter(s => s.roomNo === user.roomNo && s.id !== user.id);
+            const token = localStorage.getItem('authToken') || localStorage.getItem('token');
             const list = document.getElementById('roommates-list');
-
-            if (roommates.length === 0) {
-                list.innerHTML = '<p class="text-muted">No roommates yet.</p>';
-            } else {
-                list.innerHTML = roommates.map(r => `
-                    <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom last-border-0">
-                        <div class="user-avatar">${r.name.charAt(0)}</div>
-                        <div>
-                            <div class="fw-bold">${r.name}</div>
-                            <div class="small text-muted">${r.course}</div>
-                        </div>
-                    </div>
-                `).join('');
-            }
+            apiStudentRoom(token, localStorage.getItem('authUserId'))
+                .then(data => {
+                    if (!data.roomAssigned) {
+                        document.getElementById('r-number').textContent = '-';
+                        document.getElementById('r-type').textContent = '-';
+                        document.getElementById('r-capacity').textContent = '-';
+                        document.getElementById('r-occupied').textContent = '-';
+                        list.innerHTML = '<p class="text-muted">You have not been assigned a room yet.</p>';
+                        return;
+                    }
+                    document.getElementById('r-number').textContent = data.roomNumber;
+                    document.getElementById('r-type').textContent = data.roomType;
+                    document.getElementById('r-capacity').textContent = data.capacity + ' Persons';
+                    document.getElementById('r-occupied').textContent = data.currentOccupancy + ' Occupied';
+                    if (!data.roommates || data.roommates.length === 0) {
+                        list.innerHTML = '<p class="text-muted">No roommates yet.</p>';
+                    } else {
+                        list.innerHTML = data.roommates.map(name => `
+                            <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom last-border-0">
+                                <div class="user-avatar">${name.charAt(0)}</div>
+                                <div>
+                                    <div class="fw-bold">${name}</div>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                })
+                .catch(() => {
+                    list.innerHTML = '<p class="text-muted">Unable to load room details.</p>';
+                });
         });
     </script>
 </body>

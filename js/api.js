@@ -79,3 +79,57 @@ async function apiGetBookings(token, userId) {
   });
 }
 
+async function apiUpdateProfile(token, payload) {
+  return apiRequest('/api/users/updateProfile', {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+}
+
+async function apiAdminCreateRoom(token, payload) {
+  return apiRequest('/api/admin/rooms', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  });
+}
+
+async function apiAdminGetRooms(token) {
+  return apiRequest('/api/admin/rooms', {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+async function apiAdminAssignRoom(token, payload) {
+  return apiRequest('/api/admin/assign-room', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  });
+}
+
+async function apiStudentRoom(token, studentId) {
+  return apiRequest(`/api/student/room/${studentId}`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+async function apiStudentAttendance(token, studentId) {
+  return apiRequest(`/api/student/attendance/${studentId}`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+async function apiAdminGetStudents(token) {
+  return apiRequest('/api/admin/students', {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
