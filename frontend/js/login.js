@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       console.log('[Login] Submitting login request', { email, role });
 
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch('https://vvitu-hostelhubb.vercel.app/login.html/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, role }),

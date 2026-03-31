@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const payload = { name, email, phone, password, role };
       console.log('[Signup] Submitting signup request', payload);
 
-      const response = await fetch('http://localhost:5000/api/auth/signup', {
+      const response = await fetch('https://vvitu-hostelhubb.vercel.app/signup.html/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
