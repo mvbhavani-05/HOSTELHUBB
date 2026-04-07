@@ -1,7 +1,11 @@
 // Simple API helper functions for calling the HostelHub backend.
 // Update API_BASE_URL if your backend runs on a different host/port.
 
-const API_BASE_URL = 'http://localhost:5000';
+// Automatically use localhost for local testing, and your Render URL for production.
+const RENDER_API_URL = 'https://hostelhub-backend.onrender.com'; // WARNING: Replace with your actual Render URL!
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+  ? 'http://localhost:5000' 
+  : RENDER_API_URL;
 
 async function apiRequest(path, options = {}) {
   const url = `${API_BASE_URL}${path}`;
